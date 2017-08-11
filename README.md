@@ -1,4 +1,4 @@
-# forecast
+# darksky
 
 Dark Sky API wrapper in Go (Golang)
 
@@ -11,10 +11,11 @@ package main
 
 import (
     "fmt"
-    forecast "github.com/mlbright/forecast/v2"
     "io/ioutil"
     "log"
     "strings"
+    
+    "github.com/jacobfoard/darksky"
 )
 
 func main() {
@@ -29,7 +30,7 @@ func main() {
     lat := "43.6595"
     long := "-79.3433"
 
-	f, err := forecast.Get(key, lat, long, "now", forecast.CA, forecast.English)
+	f, err := darksky.GetForecast(key, lat, long, "now", darksky.CA, darksky.English)
     if err != nil {
         log.Fatal(err)
     }

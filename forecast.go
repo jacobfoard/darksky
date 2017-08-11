@@ -1,4 +1,4 @@
-package forecast
+package darksky
 
 import (
 	"encoding/json"
@@ -12,6 +12,7 @@ const (
 	BASEURL = "https://api.darksky.net/forecast"
 )
 
+//Flags are the optional fields that can come back from the API such as weather stations
 type Flags struct {
 	DarkSkyUnavailable string   `json:"darksky-unavailable,omitempty"`
 	DarkSkyStations    []string `json:"darksky-stations,omitempty"`
@@ -25,48 +26,55 @@ type Flags struct {
 	Units              string   `json:"units,omitempty"`
 }
 
+// DataPoint is the catch all type that includes all of the fields a forecast could have
 type DataPoint struct {
-	Time                       int64   `json:"time,omitempty"`
+	Time                       int     `json:"time,omitempty"`
 	Summary                    string  `json:"summary,omitempty"`
 	Icon                       string  `json:"icon,omitempty"`
-	SunriseTime                int64   `json:"sunriseTime,omitempty"`
-	SunsetTime                 int64   `json:"sunsetTime,omitempty"`
+	SunriseTime                int     `json:"sunriseTime,omitempty"`
+	SunsetTime                 int     `json:"sunsetTime,omitempty"`
+	MoonPhase                  float64 `json:"moonPhase,omitempty"`
 	PrecipIntensity            float64 `json:"precipIntensity,omitempty"`
 	PrecipIntensityMax         float64 `json:"precipIntensityMax,omitempty"`
-	PrecipIntensityMaxTime     int64   `json:"precipIntensityMaxTime,omitempty"`
+	PrecipIntensityMaxTime     int     `json:"precipIntensityMaxTime,omitempty,omitempty"`
 	PrecipProbability          float64 `json:"precipProbability,omitempty"`
-	PrecipType                 string  `json:"precipType,omitempty"`
 	PrecipAccumulation         float64 `json:"precipAccumulation,omitempty"`
+	PrecipType                 string  `json:"precipType,omitempty,omitempty"`
 	Temperature                float64 `json:"temperature,omitempty"`
 	TemperatureMin             float64 `json:"temperatureMin,omitempty"`
-	TemperatureMinTime         int64   `json:"temperatureMinTime,omitempty"`
+	TemperatureMinTime         int     `json:"temperatureMinTime,omitempty"`
 	TemperatureMax             float64 `json:"temperatureMax,omitempty"`
-	TemperatureMaxTime         int64   `json:"temperatureMaxTime,omitempty"`
+	TemperatureMaxTime         int     `json:"temperatureMaxTime,omitempty"`
 	ApparentTemperature        float64 `json:"apparentTemperature,omitempty"`
 	ApparentTemperatureMin     float64 `json:"apparentTemperatureMin,omitempty"`
-	ApparentTemperatureMinTime int64   `json:"apparentTemperatureMinTime,omitempty"`
+	ApparentTemperatureMinTime int     `json:"apparentTemperatureMinTime,omitempty"`
 	ApparentTemperatureMax     float64 `json:"apparentTemperatureMax,omitempty"`
-	ApparentTemperatureMaxTime int64   `json:"apparentTemperatureMaxTime,omitempty"`
-	NearestStormBearing        float64 `json:"nearestStormBearing,omitempty"`
-	NearestStormDistance       int64   `json:"nearestStormDistance,omitempty"`
+	ApparentTemperatureMaxTime int     `json:"apparentTemperatureMaxTime,omitempty"`
+	NearestStormBearing        float64 `json:"nearestStormBearing,omitempty,omitempty"`
+	NearestStormDistance       float64 `json:"nearestStormDistance,omitempty,omitempty"`
 	DewPoint                   float64 `json:"dewPoint,omitempty"`
-	WindSpeed                  float64 `json:"windSpeed,omitempty"`
-	WindBearing                float64 `json:"windBearing,omitempty"`
-	CloudCover                 float64 `json:"cloudCover,omitempty"`
 	Humidity                   float64 `json:"humidity,omitempty"`
+	WindSpeed                  float64 `json:"windSpeed,omitempty"`
+	WindGust                   float64 `json:"windGust,omitempty"`
+	WindGustTime               int     `json:"windGustTime,omitempty"`
+	WindBearing                int     `json:"windBearing,omitempty"`
+	Visibility                 float64 `json:"visibility,omitempty,omitempty"`
+	CloudCover                 float64 `json:"cloudCover,omitempty"`
 	Pressure                   float64 `json:"pressure,omitempty"`
-	Visibility                 float64 `json:"visibility,omitempty"`
 	Ozone                      float64 `json:"ozone,omitempty"`
-	MoonPhase                  float64 `json:"moonPhase,omitempty"`
+	UvIndex                    float64 `json:"uvIndex,omitempty"`
+	UvIndexTime                int     `json:"uvIndexTime,omitempty"`
 }
 
+// DataBlock  contains the summary of the forcast and holds the datapoints
 type DataBlock struct {
 	Summary string      `json:"summary,omitempty"`
 	Icon    string      `json:"icon,omitempty"`
 	Data    []DataPoint `json:"data,omitempty"`
 }
 
-type alert struct {
+// Alert is the possible weather alerts in the area
+type Alert struct {
 	Title       string   `json:"title,omitempty"`
 	Regions     []string `json:"regions,omitempty"`
 	Severity    string   `json:"severity,omitempty"`
@@ -76,23 +84,27 @@ type alert struct {
 	URI         string   `json:"uri,omitempty"`
 }
 
+// Forecast is a full response from the api
 type Forecast struct {
-	Latitude  float64   `json:"latitude,omitempty"`
-	Longitude float64   `json:"longitude,omitempty"`
-	Timezone  string    `json:"timezone,omitempty"`
-	Offset    float64   `json:"offset,omitempty"`
-	Currently DataPoint `json:"currently,omitempty"`
-	Minutely  DataBlock `json:"minutely,omitempty"`
-	Hourly    DataBlock `json:"hourly,omitempty"`
-	Daily     DataBlock `json:"daily,omitempty"`
-	Alerts    []alert   `json:"alerts,omitempty"`
-	Flags     Flags     `json:"flags,omitempty"`
-	APICalls  int       `json:"apicalls,omitempty"`
-	Code      int       `json:"code,omitempty"`
+	Latitude     float64   `json:"latitude,omitempty"`
+	Longitude    float64   `json:"longitude,omitempty"`
+	Timezone     string    `json:"timezone,omitempty"`
+	Offset       float64   `json:"offset,omitempty"`
+	Currently    DataPoint `json:"currently,omitempty"`
+	Minutely     DataBlock `json:"minutely,omitempty"`
+	Hourly       DataBlock `json:"hourly,omitempty"`
+	Daily        DataBlock `json:"daily,omitempty"`
+	Alerts       []Alert   `json:"alerts,omitempty"`
+	Flags        Flags     `json:"flags,omitempty"`
+	APICalls     int       `json:"apiCalls,omitempty"`
+	Code         int       `json:"code,omitempty"`
+	ResponseTime int       `json:"responseTime,omitempty"`
 }
 
+// Units is an emum for the units type
 type Units string
 
+// Units types
 const (
 	CA   Units = "ca"
 	SI   Units = "si"
@@ -101,8 +113,10 @@ const (
 	AUTO Units = "auto"
 )
 
+// Lang is an enum for the languages to recive back
 type Lang string
 
+// Lang Consts
 const (
 	Arabic             Lang = "ar"
 	Azerbaijani        Lang = "az"
@@ -139,25 +153,27 @@ const (
 	TraditionalChinese Lang = "zh-tw"
 )
 
-func Get(key string, lat string, long string, time string, units Units, lang Lang) (*Forecast, error) {
-	res, err := GetResponse(key, lat, long, time, units, lang)
+// GetForecast returns the forecast for a given lat long and time
+func GetForecast(key string, lat string, long string, time string, units Units, lang Lang) (*Forecast, error) {
+	res, err := getResponse(key, lat, long, time, units, lang)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
-	f, err := FromJSON(res.Body)
+	f, err := fromJSON(res.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	calls, _ := strconv.Atoi(res.Header.Get("X-Forecast-API-Calls"))
+	f.ResponseTime, _ = strconv.Atoi(res.Header.Get("X-Response-Time"))
 	f.APICalls = calls
 
 	return f, nil
 }
 
-func FromJSON(reader io.Reader) (*Forecast, error) {
+func fromJSON(reader io.Reader) (*Forecast, error) {
 	var f Forecast
 	if err := json.NewDecoder(reader).Decode(&f); err != nil {
 		return nil, err
@@ -166,7 +182,7 @@ func FromJSON(reader io.Reader) (*Forecast, error) {
 	return &f, nil
 }
 
-func GetResponse(key string, lat string, long string, time string, units Units, lang Lang) (*http.Response, error) {
+func getResponse(key string, lat string, long string, time string, units Units, lang Lang) (*http.Response, error) {
 	coord := lat + "," + long
 
 	var url string
